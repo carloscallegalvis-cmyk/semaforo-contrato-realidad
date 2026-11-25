@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Semáforo del contrato realidad</title>
+<meta name="description" content="Instrumento de autodiagnóstico, anónimo y sin registro, para contratistas de prestación de servicios del Estado en Colombia: identifica señales de una relación laboral encubierta (art. 23 y 24 CST, art. 53 C.P.). Pedagogía en Derecho, Consultorio Jurídico Laboral UNAD.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+<style>
+/* Layout: una sola columna estrecha, una pregunta por pantalla, como un formulario oficial sobrio */
+:root{
+  --bg:#f5f6f4; --surface:#ffffff; --fg:#1d2420; --muted:#5b655f; --line:#d9ddd8; --accent:#2f5d50;
+  --verde:#2e7d4f; --amarillo:#b7860b; --rojo:#b3402f;
+  --display:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --body:"Public Sans", -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141917; --surface:#1c2320; --fg:#e7ece9; --muted:#9aa59f; --line:#2e3833; --accent:#7fb8a6;
+  --verde:#5fbf86; --amarillo:#e0b443; --rojo:#e47a66; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141917; --surface:#1c2320; --fg:#e7ece9; --muted:#9aa59f; --line:#2e3833; --accent:#7fb8a6;
+  --verde:#5fbf86; --amarillo:#e0b443; --rojo:#e47a66; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+.wrap>*{min-width:0}
+body{background:var(--bg);color:var(--fg);font:16px/1.55 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 40px}
+.wrap{max-width:560px;margin:0 auto;display:grid;gap:20px}
+h1,h2{font-family:var(--display);font-weight:600;text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:1.75rem} h2{font-size:1.3rem}
+p{margin:0}
+.eyebrow{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:14px}
+.muted{color:var(--muted);font-size:.92rem}
+button{font:600 1rem var(--body);border-radius:8px;padding:12px 16px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+button.primary{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .2s}
+.luz{display:flex;gap:10px;align-items:center}
+.dot{width:22px;height:22px;border-radius:50%;flex:none}
+ul{margin:0;padding-left:20px;display:grid;gap:6px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.law{font-size:.85rem;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+
+<div class="wrap">
+  <header style="display:grid;gap:6px">
+    <span class="eyebrow">Autodiagnóstico · 2 minutos · anónimo</span>
+    <h1>¿Contratista o trabajador?</h1>
+  </header>
+
+  <section id="intro" class="card">
+    <p>Si usted presta servicios al Estado con contratos de prestación de servicios, estas 10 preguntas le ayudan a ver si su vínculo tiene las señales de una <strong>relación laboral encubierta</strong> (lo que la ley llama <em>contrato realidad</em>).</p>
+    <p class="muted">Nada se envía ni se guarda: el resultado se calcula en su teléfono y desaparece al cerrar la página. No pide nombre, entidad ni correo.</p>
+    <p class="muted">No es un concepto jurídico ni una demanda: es una orientación para saber si vale la pena consultar.</p>
+    <button id="start" class="primary">Empezar</button>
+  </section>
+
+  <section id="quiz" class="card" hidden>
+    <div class="bar" aria-hidden="true"><i id="prog"></i></div>
+    <span class="eyebrow" id="count"></span>
+    <h2 id="q"></h2>
+    <p class="muted" id="hint"></p>
+    <div class="opts">
+      <button data-v="si">Sí</button>
+      <button data-v="no">No</button>
+      <button data-v="ns">No sé</button>
+    </div>
+    <button id="back" class="muted" style="justify-self:start;border:none;background:none;padding:4px 0">← Anterior</button>
+  </section>
+
+  <section id="result" class="card" hidden>
+    <div class="luz"><span class="dot" id="dot"></span><h2 id="rtitle"></h2></div>
+    <p id="rtext"></p>
+    <div><span class="eyebrow">Qué hacer</span><ul id="ruta"></ul></div>
+    <div><span class="eyebrow">Qué guardar desde hoy</span>
+      <ul>
+        <li>Correos o chats donde le den órdenes, horarios o le pidan permisos.</li>
+        <li>Fotos de su carné, puesto de trabajo, uniforme o equipos de la entidad.</li>
+        <li>Todos sus contratos, actas de inicio y cuentas de cobro, con fechas.</li>
+        <li>Nombres de compañeros de planta que hacen la misma labor que usted.</li>
+        <li>Planillas de seguridad social que usted pagó.</li>
+      </ul>
+      <p class="muted" style="margin-top:8px">El valor está en estas pruebas, no en el color del semáforo. Guárdelas en un lugar personal, fuera del correo de la entidad.</p>
+    </div>
+    <div id="fbbox" class="card" style="padding:14px" hidden>
+      <p><strong>Ayúdenos a mejorar esta herramienta.</strong> Es anónimo y toma un minuto. Su color fue: <strong id="fbcolor"></strong>.</p>
+      <a id="fb" class="primary" target="_blank" rel="noopener" style="display:inline-block;text-align:center;text-decoration:none;font:600 1rem var(--body);border-radius:8px;padding:12px 16px;background:var(--accent);color:var(--bg)">Responder 3 preguntas</a>
+    </div>
+    <div class="row">
+      <button id="again">Repetir</button>
+    </div>
+    <p class="law">Fundamento: art. 53 de la Constitución (primacía de la realidad sobre las formas); arts. 23 y 24 del Código Sustantivo del Trabajo (prestación personal, subordinación y remuneración; presunción de contrato de trabajo); Ley 80 de 1993, art. 32-3 (la prestación de servicios es excepcional y temporal); Corte Constitucional C-154 de 1997 y C-614 de 2009; Consejo de Estado, Sección Segunda (permanencia y similitud con el personal de planta).</p>
+  </section>
+
+  <footer class="muted" style="font-size:.8rem">Pedagogía en Derecho · Consultorio Jurídico I (Laboral) · Universidad Nacional Abierta y a Distancia — UNAD · Elaborado por un estudiante bajo la orientación del docente asesor. Versión 1 · noviembre de 2026.</footer>
+</div>
+
+<script>
+const FORM_URL=""; // enlace del Formulario de Google
+const Q=[
+ {t:"¿Cumple un horario fijado por la entidad?",h:"Hora de entrada y salida, turnos, o le llaman la atención si llega tarde.",w:3},
+ {t:"¿Debe pedir permiso para ausentarse o para una cita médica?",h:"No basta con avisar: alguien debe autorizarlo.",w:3},
+ {t:"¿Recibe órdenes de un jefe sobre cómo y cuándo hacer su trabajo?",h:"Más allá de coordinar entregables: le dicen qué hacer en el día a día.",w:3},
+ {t:"¿Hace lo mismo que funcionarios de planta de la entidad?",h:"Mismas tareas, mismo equipo, misma oficina.",w:3},
+ {t:"¿Su labor es parte de las funciones permanentes de la entidad?",h:"Lo que hace es necesario todos los años, no un proyecto puntual.",w:3},
+ {t:"¿Le han renovado el contrato varias veces seguidas, con pocos días de interrupción?",h:"Por ejemplo, contratos de 6 a 11 meses durante varios años.",w:2},
+ {t:"¿Trabaja en las instalaciones de la entidad, con sus equipos o su correo institucional?",h:"Computador, puesto, carné o cuenta de correo de la entidad.",w:2},
+ {t:"¿Debe presentar informes o reportes a un supervisor que evalúa su desempeño como el de un empleado?",h:"Evaluaciones, llamados de atención, metas fijadas por otros.",w:2},
+ {t:"¿Le sería imposible enviar a otra persona a hacer su trabajo en su lugar?",h:"El servicio lo tiene que prestar usted, personalmente.",w:2},
+ {t:"¿Le asignan tareas fuera del objeto del contrato o en días no hábiles?",h:"Turnos, fines de semana, eventos, funciones que no están en el contrato.",w:1}
+];
+const max=Q.reduce((s,q)=>s+q.w,0);
+let i=0, ans=[];
+const $=id=>document.getElementById(id);
+function show(id){["intro","quiz","result"].forEach(s=>$(s).hidden=s!==id)}
+function render(){
+  $("count").textContent=`Pregunta ${i+1} de ${Q.length}`;
+  $("q").textContent=Q[i].t; $("hint").textContent=Q[i].h;
+  $("prog").style.width=`${(i/Q.length)*100}%`;
+  $("back").hidden=i===0;
+}
+function finish(){
+  let pts=0, ns=0;
+  ans.forEach((a,k)=>{ if(a==="si") pts+=Q[k].w; if(a==="ns"){ns++; pts+=Q[k].w*0.5} });
+  const core=[0,1,2].filter(k=>ans[k]==="si").length;
+  const pct=pts/max;
+  let c;
+  if(pct>=0.55 || (core>=2 && (ans[3]==="si"||ans[4]==="si"))) c="rojo";
+  else if(pct>=0.25 || core>=1) c="amarillo";
+  else c="verde";
+  const R={
+   rojo:{t:"Fuerte indicio de contrato realidad",x:"Varias respuestas muestran subordinación y permanencia: los rasgos de un empleo, no de un contrato de servicios. Es un indicio, no una sentencia.",r:["Consulte pronto: los plazos para reclamar frente al Estado son cortos y se cuentan desde la terminación del vínculo.","Pida asesoría gratuita en un consultorio jurídico universitario o en la Defensoría del Pueblo.","Empiece hoy la lista de pruebas de abajo, mientras todavía tiene acceso a ellas.","Aunque pase el tiempo, los aportes a pensión que la entidad dejó de pagar se pueden reclamar."]},
+   amarillo:{t:"Señales de alarma",x:"Su vínculo tiene algunos rasgos de subordinación. Puede ser un contrato de servicios legítimo que se está desnaturalizando.",r:["Revise si las órdenes y el horario se vuelven costumbre: eso pesa más que el texto del contrato.","Guarde desde ya las pruebas de la lista de abajo.","Si su contrato termina o no se lo renuevan, consulte de inmediato."]},
+   verde:{t:"Contrato de servicios con autonomía",x:"Sus respuestas describen un trabajo independiente: usted organiza su tiempo y su forma de trabajar.",r:["Vigile si cambian las condiciones: un horario fijo o un jefe directo pueden convertir el vínculo en laboral.","Conserve sus contratos y cuentas de cobro."]}
+  }[c];
+  $("dot").style.background=`var(--${c})`;
+  $("rtitle").textContent=R.t;
+  $("rtext").textContent=R.x+(ns>=3?" Respondió “No sé” varias veces: averiguar esas respuestas puede cambiar el resultado.":"");
+  $("ruta").innerHTML=R.r.map(s=>`<li>${s}</li>`).join("");
+  const fbn={rojo:"Rojo",amarillo:"Amarillo",verde:"Verde"}[c];
+  if(FORM_URL){$("fb").href=FORM_URL;$("fbcolor").textContent=fbn;$("fbbox").hidden=false;}
+  show("result");
+}
+$("start").onclick=()=>{i=0;ans=[];show("quiz");render()};
+document.querySelectorAll(".opts button").forEach(b=>b.onclick=()=>{ans[i]=b.dataset.v; i++; i<Q.length?render():finish()});
+$("back").onclick=()=>{if(i>0){i--;render()}};
+$("again").onclick=()=>{show("intro")};
+</script>
+
+</html>
